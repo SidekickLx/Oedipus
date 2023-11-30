@@ -32,7 +32,7 @@ def defineArguments():
     parser.add_argument("-g", "--statlogfile", help="The file containing a dump of classification results.", required=False, default="log.txt")
     parser.add_argument("-s", "--sourcedir", help="The path to the directory containing the [un]obfuscated source code files.", required=False, default=".")
     parser.add_argument("-p", "--originalprograms", help="The path to the directory containing the original, unobfuscated programs.", required=False, default=".")
-    parser.add_argument("-d", "--tigressdir", help="The path to the directory of \"tigress\".", required=False, default=".")
+    parser.add_argument("-d", "--tigressdir", help="The path to the directory of \"tigress\".", required=False, default="/usr/local/bin/tigresspkg/3.3.3")
     parser.add_argument("-f", "--obfuscationfunction", help="The name of the function to obfuscate e.g. \"main\"", required=False, default="main")
     parser.add_argument("-r", "--filterfunction", help="The function to focus on during trace filteration.", required=False, default="main")
     parser.add_argument("-o", "--obfuscationlevel", help="The number of obfuscation combinations to employ.", required=False, default=1) 

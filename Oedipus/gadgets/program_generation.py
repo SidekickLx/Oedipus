@@ -43,6 +43,7 @@ def generateMultipleObfuscations(currentFile, tigressDir, obfuscationLevel=1, ob
             # Generate the timesamp for the file to generate
             currentFileTimestamp = str(time.time()).replace(".", "_")
             jitFlag = False
+            tigressCmd += ["--Environment=x86_64:Linux:Clang:10.0"]
             for transformation in permutation:
                 if transformation == "AddOpaque":# or transformation == "EncodeLiterals":
                     tigressCmd += ["--Transform=InitOpaque", "--Functions=%s" % obfuscationFunction]
@@ -58,10 +59,8 @@ def generateMultipleObfuscations(currentFile, tigressDir, obfuscationLevel=1, ob
                 # Add the transformation, its paramters, and the target function(s)
                 tigressCmd.append("--Transform=%s" % transformation)
                 tigressCmd.append("--Functions=%s" % obfuscationFunction)
-            
             #TODO: prepends "obf" to the generated file name
-            tigressCmd.append("--FilePrefix=obf%s" % obfuscationLevel+1) 
-
+            tigressCmd.append("--FilePrefix=obf%s" % str(obfuscationLevel+1)) 
             # Specify the output file
             if jitFlag:
                 tigressCmd.append("--out=%s_%s.c" % (currentFile.replace(".c", ""), currentFileTimestamp))

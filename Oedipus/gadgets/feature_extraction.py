@@ -24,9 +24,9 @@ def generateObjdumpDisassembly(outFile, inExt=".out", outExt=".objdump"):
     """ Generates an Objdump of an executable """
     # Check whether file is executable using "file"
     fileOutput = subprocess.Popen(["file", outFile], stderr=subprocess.STDOUT, stdout=subprocess.PIPE).communicate()[0]
-    if fileOutput.lower().find("executable") == -1:
-        prettyPrint("The file \"%s\" is not an executable" % outFile, "warning")
-        return False
+    # if fileOutput.lower().find("executable") == -1:
+    #     prettyPrint("The file \"%s\" is not an executable" % outFile, "warning")
+    #     return False
     # Generate the objdump disassembly 
     objdumpFile = open(outFile.replace(inExt, outExt), "w")
     objdumpArgs = ["objdump", "--disassemble", outFile]
@@ -45,9 +45,9 @@ def generateGDBScript(logFile="gdb.txt", inputFile="", runArgs=[]):
         # Bundle all the arguments in one string
         args = " ".join([a for a in runArgs])
         # Beware of the "step" versus "stepi"
-        gdbScript.write("set logging file %s\nset logging on\nset height 0\nset $_exitcode = -999\nset $_instructioncount = 0\nbreak __libc_start_main\nrun `< %s`\nwhile $_instructioncount <= 50000\n\tx/i $pc\n\tstepi\n\tif $_exitcode != -999\n\t\tset logging off\n\t\tquit\n\tend\n\tset $_instructioncount = $_instructioncount + 1\nend\nset logging off\nquit" % (logFile, inputFile))
+        gdbScript.write("set logging file %s\nset logging on\nset height 0\nset $_exitcode = -999\nset $_instructioncount = 0\nset breakpoint pending on\nbreak __libc_start_main\nrun `< %s`\nwhile $_instructioncount <= 50000\n\tx/i $pc\n\tstepi\n\tif $_exitcode != -999\n\t\tset logging off\n\t\tquit\n\tend\n\tset $_instructioncount = $_instructioncount + 1\nend\nset logging off\nquit" % (logFile, inputFile))
     else:
-        gdbScript.write("set logging file %s\nset logging on\nset height 0\nset $_exitcode = -999\nset $_instructioncount = 0\nbreak __libc_start_main\nrun\nwhile $_instructioncount <= 50000\n\tx/i $pc\n\tstepi\n\tif $_exitcode != -999\n\t\tset logging off\n\t\tquit\n\tend\n\tset $_instructioncount = $_instructioncount + 1\nend\nset logging off\nquit" % logFile)
+        gdbScript.write("set logging file %s\nset logging on\nset height 0\nset $_exitcode = -999\nset $_instructioncount = 0\nset breakpoint pending on\nbreak __libc_start_main\nrun\nwhile $_instructioncount <= 50000\n\tx/i $pc\n\tstepi\n\tif $_exitcode != -999\n\t\tset logging off\n\t\tquit\n\tend\n\tset $_instructioncount = $_instructioncount + 1\nend\nset logging off\nquit" % logFile)
     gdbScript.close()
     return gdbScript.name
 
@@ -57,7 +57,7 @@ def compileFile(targetFile):
     outFile = targetFile[targetFile.rfind("/")+1:].replace(".c",".out")
     outFile_strip = targetFile[targetFile.rfind("/")+1:].replace(".c", ".outs")
     #outFile = "%s_%s.out" % (fileName, aoutTimestamp)
-    gccArgs = ["gcc", "-Wl,--unresolved-symbols=ignore-in-object-files","-std=c99", targetFile, "-o", outFile]
+    gccArgs = ["gcc", "-g", "-Wl,--unresolved-symbols=ignore-in-object-files","-std=c99", targetFile, "-o", outFile]
     gccArgs_strip = ["gcc", "-s", "-Wl,--unresolved-symbols=ignore-in-object-files","-std=c99", targetFile, "-o", outFile_strip]
     prettyPrint("Compiling \"%s\"" % targetFile, "debug")
     subprocess.Popen(gccArgs, stderr=subprocess.STDOUT, stdout=subprocess.PIPE).communicate()[0]
@@ -273,19 +273,19 @@ def extractTFIDF(sourceDir, sourceFiles):
                 shutil.copy(outFile_strip.replace(".outs", ".objdumps"), sourceDir)
 
             # (2) Generate a disassembly trace file
-            _generateDisassembly(targetFile, outFile, outFile_strip)
+            print(_generateDisassembly(targetFile, outFile, outFile_strip))
 
         # (3) After all files are done, load all the "dyndis" files and extract TF-IDF features from them.
-        #disassemblyFiles = glob.glob("%s/*.dyndis" % sourceDir)
-        #if len(disassemblyFiles) < 1:
-        #    prettyPrint("Unable to retrieve \".dyndis\" files from \"%s\"" % sourceDir, "warning")
-        #    return False
-        #prettyPrint("Successfully retrieved %s \".dyndis\" files from \"%s\"" % (len(disassemblyFiles), sourceDir))
-        #if extractTFIDFMemoryFriendly(disassemblyFiles, "dyndis"):
-        #    prettyPrint("TF-IDF features were successfully generated")
-        #else:
-        #    prettyPrint("Could not generated TF-IDF features", "warning")
-        #    return False
+        disassemblyFiles = glob.glob("%s/*.dyndis" % sourceDir)
+        if len(disassemblyFiles) < 1:
+           prettyPrint("Unable to retrieve \".dyndis\" files from \"%s\"" % sourceDir, "warning")
+           return False
+        prettyPrint("Successfully retrieved %s \".dyndis\" files from \"%s\"" % (len(disassemblyFiles), sourceDir))
+        if extractTFIDFMemoryFriendly(disassemblyFiles, "dyndis"):
+           prettyPrint("TF-IDF features were successfully generated")
+        else:
+           prettyPrint("Could not generated TF-IDF features", "warning")
+           return False
          
     except Exception as e:
         prettyPrint("Error encountered in \"extractTFIDF\": %s" %e, "error")

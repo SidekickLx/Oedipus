@@ -39,7 +39,7 @@ def defineArguments():
     parser.add_argument("-a", "--algorithm", help="The machine learning algorithm to use.", required=False, default="tree", choices=["bayes", "tree"])
     parser.add_argument("-t", "--datatype", help="The format of data to consider e.g. numerical, traces, etc.", required=False, default="tfidf")
     parser.add_argument("-l", "--datalabel", help="The type of the label to load", required=False, default="label", choices=["label", "metadata"])
-    parser.add_argument("-k", "--kfold", help="The number of folds to consider for K-fold cross validation.", required=False, default=10)
+    parser.add_argument("-k", "--kfold", help="The number of folds to consider for K-fold cross validation.", required=False, default=2)
     parser.add_argument("-x", "--dimension", help="The dimension to which the data is projected before plotting.", required=False, default=2)
     parser.add_argument("-z", "--visualalgorithm", help="The algorithm used to project data into 2- or 3-dimensional space.", required=False, default="tsne", choices=["tsne", "pca"])
     parser.add_argument("-v", "--verbose", help="Displays debug messages on the screen.", default="no", choices=["yes", "no"], required=False)
@@ -144,7 +144,7 @@ def main():
                    prettyPrint("Plotting accuracies")
                    data_visualization.plotAccuracyGraph(targetDimensions, accuracies, "Number of Selected Features", "Classification Accuracy", "Classification Accuracy: Selected Features (%s)" % arguments.datatype, "accuracy_%s_exp1_%s_selectkbest.pdf" % (arguments.datatype, arguments.algorithm)) 
                    # Plot performance graph
-                   print timings
+                   print(timings)
                    #prettyPrint("Plotting performance")
                    #data_visualization.plotAccuracyGraph(targetDimensions, timings, "Number of Selected Features", "Classification Timing (sec)", "Classification Timing: Selected Features (%s)" % arguments.datatype) 
                   
@@ -169,7 +169,7 @@ def main():
                    prettyPrint("Plotting accuracies")
                    data_visualization.plotAccuracyGraph(targetDimensions, accuracies, "Number of Extracted Features", "Classification Accuracy", "Classification Accuracy: PCA (%s)" % arguments.datatype, "accuracy_%s_exp1_%s_pca.pdf" % (arguments.datatype, arguments.algorithm))
                    # Plot performance graph
-                   print timings
+                   print(timings)
                    #prettyPrint("Plotting performance")
                    #data_visualization.plotAccuracyGraph(targetDimensions, timings, "Number of Extracted Features", "Classification Timing (sec)", "Classification Timing: PCA (%s)" % arguments.datatype)
 
@@ -211,7 +211,7 @@ def main():
                # Plot performance graph
                #prettyPrint("Plotting timings")
                #data_visualization.plotAccuracyGraph(allDepths, timings, "Maximum Tree Depth", "Classification Timing (sec)", "Classification Timing: %s (%s)" % (splittingCriterion, arguments.datatype))
-               print timings
+               print(timings)
  
            return
 
@@ -248,7 +248,7 @@ def main():
                 # Remove the indices from trainingPrograms
                 trainingPrograms = [x for x in trainingPrograms if not x in trainingPrograms[testStartIndex:testStopIndex]]
                 if arguments.verbose == "yes":
-  		    prettyPrint("Original training programs: %s, original test programs: %s" % (len(trainingPrograms), len(testPrograms)), "debug")
+                    prettyPrint("Original training programs: %s, original test programs: %s" % (len(trainingPrograms), len(testPrograms)), "debug")
                 # Now load the training and test samples from the source directory
                 # 1- First we need to retrieve the obfuscated versions of the
                 tempTraining, tempTest = [], []

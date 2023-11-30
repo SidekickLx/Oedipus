@@ -45,8 +45,8 @@ def generateMultipleObfuscations(currentFile, tigressDir, obfuscationLevel=1, ob
             jitFlag = False
             tigressCmd += ["--Environment=x86_64:Linux:Clang:10.0"]
             for transformation in permutation:
-                if transformation == "AddOpaque":# or transformation == "EncodeLiterals":
-                    tigressCmd += ["--Transform=InitOpaque", "--Functions=%s" % obfuscationFunction]
+                if transformation == "AddOpaque" or transformation == "EncodeLiterals":
+                    tigressCmd += ["--Transform=InitOpaque", "--Functions=%s" % obfuscationFunction, "--InitOpaqueStructs=list", "--Transform=InitBranchFuns", "--InitBranchFunsCount=1"]
                 # Add the necessary "#include" for Jitting to a copy of the file
                 if transformation == "Jit":
                     fileContent = open(currentFile).read()
@@ -59,6 +59,9 @@ def generateMultipleObfuscations(currentFile, tigressDir, obfuscationLevel=1, ob
                 # Add the transformation, its paramters, and the target function(s)
                 tigressCmd.append("--Transform=%s" % transformation)
                 tigressCmd.append("--Functions=%s" % obfuscationFunction)
+                if transformation == "AddOpaque":
+                    tigressCmd += [" --AddOpaqueStructs=list", "--AddOpaqueKinds=true"]
+
             #TODO: prepends "obf" to the generated file name
             tigressCmd.append("--FilePrefix=obf%s" % str(obfuscationLevel+1)) 
             # Specify the output file
